@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BloodPressure.Maui.Views.BloodPressureFormPage"
+             Title="{Binding FormTitle}">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="20" Spacing="18">
+
+            <Label Text="{Binding FormTitle}"
+                   FontSize="24"
+                   FontAttributes="Bold" />
+
+            <Border IsVisible="{Binding HasValidationErrors}"
+                    BackgroundColor="#FFEBEE"
+                    StrokeShape="RoundRectangle 10"
+                    Padding="14">
+                <VerticalStackLayout Spacing="6">
+                    <Label Text="Por favor, corrija los siguientes errores:"
+                           FontAttributes="Bold"
+                           TextColor="#B71C1C" />
+                    <VerticalStackLayout Spacing="2" BindableLayout.ItemsSource="{Binding ValidationErrors}">
+                        <BindableLayout.ItemTemplate>
+                            <DataTemplate>
+                                <Label Text="{Binding .}"
+                                       TextColor="#B71C1C"
+                                       FontSize="13"
+                                       LineBreakMode="WordWrap" />
+                            </DataTemplate>
+                        </BindableLayout.ItemTemplate>
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Presión sistólica (mmHg)" FontAttributes="Bold" />
+                <Entry Text="{Binding SystolicText}" Keyboard="Numeric" Placeholder="Ej. 120" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Presión diastólica (mmHg)" FontAttributes="Bold" />
+                <Entry Text="{Binding DiastolicText}" Keyboard="Numeric" Placeholder="Ej. 80" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Fecha" FontAttributes="Bold" />
+                <DatePicker Date="{Binding RecordedDate}" Format="dd/MM/yyyy" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Hora" FontAttributes="Bold" />
+                <TimePicker Time="{Binding RecordedTime}" Format="HH:mm" />
+            </VerticalStackLayout>
+
+            <VerticalStackLayout Spacing="4">
+                <Label Text="Notas (opcional)" FontAttributes="Bold" />
+                <Editor Text="{Binding Notes}"
+                        MaxLength="500"
+                        HeightRequest="100"
+                        Placeholder="Observaciones de la medición" />
+            </VerticalStackLayout>
+
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,10,0,0">
+                <Button Grid.Column="0"
+                        Text="Cancelar"
+                        Command="{Binding CancelFormCommand}"
+                        BackgroundColor="{StaticResource Gray500}" />
+                <Button Grid.Column="1"
+                        Text="{Binding SaveButtonText}"
+                        Command="{Binding SaveFormCommand}"
+                        IsEnabled="{Binding IsNotBusy}" />
+            </Grid>
+
+            <ActivityIndicator IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               Margin="0,10,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

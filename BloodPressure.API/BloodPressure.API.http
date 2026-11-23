@@ -1,0 +1,42 @@
+@Api = http://localhost:5080
+
+### Obtener todas las mediciones
+GET {{Api}}/api/bloodpressure
+
+### Obtener una medición
+GET {{Api}}/api/bloodpressure/1
+
+### Registrar una medición válida
+POST {{Api}}/api/bloodpressure
+Content-Type: application/json
+
+{
+  "systolic": 118,
+  "diastolic": 76,
+  "recordedAt": "2026-11-05T08:30:00",
+  "notes": "En ayunas"
+}
+
+### Registrar una medición inválida (debe devolver 400 con un arreglo de textos)
+POST {{Api}}/api/bloodpressure
+Content-Type: application/json
+
+{
+  "systolic": 300,
+  "diastolic": 310,
+  "recordedAt": "2026-11-05T08:30:00"
+}
+
+### Actualizar una medición
+PUT {{Api}}/api/bloodpressure/1
+Content-Type: application/json
+
+{
+  "systolic": 135,
+  "diastolic": 85,
+  "recordedAt": "2026-11-05T09:00:00",
+  "notes": null
+}
+
+### Eliminar una medición
+DELETE {{Api}}/api/bloodpressure/1

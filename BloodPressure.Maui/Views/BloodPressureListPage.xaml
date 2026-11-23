@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:dtos="clr-namespace:BloodPressureApp.Core.DTOs;assembly=BloodPressure.Core"
+             x:Class="BloodPressure.Maui.Views.BloodPressureListPage"
+             x:Name="RootPage"
+             Title="Mediciones">
+
+    <Grid>
+
+        <Grid RowDefinitions="Auto,Auto,*" Padding="0">
+
+            <VerticalStackLayout Grid.Row="0" Padding="20,20,20,5" Spacing="2">
+                <Label Text="Presión arterial"
+                       FontSize="28"
+                       FontAttributes="Bold" />
+                <Label Text="Historial de mediciones"
+                       FontSize="14"
+                       TextColor="{StaticResource Gray500}" />
+            </VerticalStackLayout>
+
+            <Border Grid.Row="1"
+                    Margin="15,10,15,0"
+                    Padding="12"
+                    BackgroundColor="#FFEBEE"
+                    StrokeShape="RoundRectangle 8"
+                    IsVisible="{Binding HasListError}">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="{Binding ListErrorMessage}"
+                           TextColor="#B71C1C"
+                           LineBreakMode="WordWrap" />
+                    <Button Text="Reintentar"
+                            Command="{Binding LoadMeasurementsCommand}"
+                            HorizontalOptions="Start"
+                            BackgroundColor="#B71C1C" />
+                </VerticalStackLayout>
+            </Border>
+
+            <ActivityIndicator Grid.Row="2"
+                               IsRunning="{Binding IsBusy}"
+                               IsVisible="{Binding IsBusy}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+
+            <Label Grid.Row="2"
+                   Text="Aún no hay mediciones registradas"
+                   TextColor="{StaticResource Gray500}"
+                   HorizontalOptions="Center"
+                   VerticalOptions="Center"
+                   IsVisible="{Binding IsListEmpty}" />
+
+            <CollectionView Grid.Row="2"
+                            ItemsSource="{Binding BloodPressures}"
+                            SelectionMode="None"
+                            IsVisible="{Binding IsNotBusy}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="dtos:BloodPressureDTO">
+                        <Border Margin="15,6"
+                                Padding="16"
+                                StrokeShape="RoundRectangle 14"
+                                StrokeThickness="0"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray900}}">
+                            <Border.Shadow>
+                                <Shadow Brush="Black" Offset="0,2" Radius="6" Opacity="0.12" />
+                            </Border.Shadow>
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer
+                                    Command="{Binding Source={x:Reference RootPage}, Path=BindingContext.ShowDetailsCommand}"
+                                    CommandParameter="{Binding .}" />
+                            </Border.GestureRecognizers>
+
+                            <Grid ColumnDefinitions="Auto,*,Auto" RowDefinitions="Auto,Auto,Auto" RowSpacing="4">
+                                <Label Grid.Row="0" Grid.Column="0"
+                                       FontSize="22" FontAttributes="Bold">
+                                    <Label.FormattedText>
+                                        <FormattedString>
+                                            <Span Text="{Binding Systolic}" />
+                                            <Span Text=" / " />
+                                            <Span Text="{Binding Diastolic}" />
+                                        </FormattedString>
+                                    </Label.FormattedText>
+                                </Label>
+                                <Label Grid.Row="0" Grid.Column="1"
+                                       Text="mmHg"
+                                       FontSize="12"
+                                       TextColor="{StaticResource Gray500}"
+                                       VerticalOptions="End"
+                                       Margin="6,0,0,4" />
+
+                                <Label Grid.Row="0" Grid.Column="2"
+                                       Text="{Binding Classification}"
+                                       FontAttributes="Bold"
+                                       FontSize="12">
+                                    <Label.Triggers>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding Classification}"
+                                                     Value="Normal">
+                                            <Setter Property="TextColor" Value="#2E7D32" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding Classification}"
+                                                     Value="Elevada">
+                                            <Setter Property="TextColor" Value="#F9A825" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding Classification}"
+                                                     Value="Hipertensión etapa 1">
+                                            <Setter Property="TextColor" Value="#EF6C00" />
+                                        </DataTrigger>
+                                        <DataTrigger TargetType="Label"
+                                                     Binding="{Binding Classification}"
+                                                     Value="Hipertensión etapa 2">
+                                            <Setter Property="TextColor" Value="#C62828" />
+                                        </DataTrigger>
+                                    </Label.Triggers>
+                                </Label>
+
+                                <Label Grid.Row="1" Grid.ColumnSpan="3"
+                                       Text="{Binding RecordedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                                       FontSize="12"
+                                       TextColor="{StaticResource Gray500}" />
+
+                                <Label Grid.Row="2" Grid.ColumnSpan="3"
+                                       Text="{Binding Notes}"
+                                       FontSize="12"
+                                       FontAttributes="Italic"
+                                       LineBreakMode="TailTruncation"
+                                       MaxLines="2"
+                                       IsVisible="{Binding Notes, Converter={StaticResource IsNotNullOrEmptyConverter}}" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <Button Text="+"
+                Command="{Binding OpenCreateFormCommand}"
+                HorizontalOptions="End"
+                VerticalOptions="End"
+                Margin="0,0,24,24"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                FontSize="28"
+                FontAttributes="Bold"
+                BackgroundColor="#1E88E5"
+                TextColor="White" />
+
+        <Grid IsVisible="{Binding IsDetailsModalVisible}" BackgroundColor="#99000000">
+            <Border Margin="30" Padding="24" VerticalOptions="Center" StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray900}}">
+                <VerticalStackLayout Spacing="14">
+
+                    <Label Text="Detalle de la medición"
+                           FontSize="20" FontAttributes="Bold" />
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Sistólica" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding SelectedMeasurement.Systolic, StringFormat='{0} mmHg'}"
+                               FontSize="16" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Diastólica" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding SelectedMeasurement.Diastolic, StringFormat='{0} mmHg'}"
+                               FontSize="16" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Fecha y hora" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding SelectedMeasurement.RecordedAt, StringFormat='{0:dd/MM/yyyy HH:mm}'}"
+                               FontSize="16" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Clasificación" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding SelectedMeasurement.Classification}"
+                               FontSize="16" FontAttributes="Bold" />
+                    </VerticalStackLayout>
+
+                    <VerticalStackLayout Spacing="6" IsVisible="{Binding SelectedMeasurementHasNotes}">
+                        <Label Text="Notas" FontSize="12" TextColor="{StaticResource Gray500}" />
+                        <Label Text="{Binding SelectedMeasurement.Notes}"
+                               FontSize="14" LineBreakMode="WordWrap" />
+                    </VerticalStackLayout>
+
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="8" Margin="0,8,0,0">
+                        <Button Grid.Column="0" Text="Editar"
+                                Command="{Binding OpenEditFormCommand}" />
+                        <Button Grid.Column="1" Text="Eliminar"
+                                Command="{Binding OpenDeleteConfirmationCommand}"
+                                BackgroundColor="#C62828" />
+                        <Button Grid.Column="2" Text="Cerrar"
+                                Command="{Binding CloseModalCommand}"
+                                BackgroundColor="{StaticResource Gray500}" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+        <Grid IsVisible="{Binding IsConfirmationModalVisible}" BackgroundColor="#99000000">
+            <Border Margin="30" Padding="24" VerticalOptions="Center" StrokeShape="RoundRectangle 16"
+                    BackgroundColor="{AppThemeBinding Light=White, Dark={StaticResource Gray900}}">
+                <VerticalStackLayout Spacing="16">
+                    <Label Text="¿Eliminar medición?"
+                           FontSize="20" FontAttributes="Bold" />
+                    <Label Text="Esta acción no se puede deshacer. ¿Desea continuar?"
+                           FontSize="14" LineBreakMode="WordWrap" />
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8" Margin="0,8,0,0">
+                        <Button Grid.Column="0" Text="Cancelar"
+                                Command="{Binding CloseModalCommand}"
+                                BackgroundColor="{StaticResource Gray500}" />
+                        <Button Grid.Column="1" Text="Confirmar eliminación"
+                                Command="{Binding ConfirmDeleteCommand}"
+                                BackgroundColor="#C62828" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+        </Grid>
+
+    </Grid>
+</ContentPage>

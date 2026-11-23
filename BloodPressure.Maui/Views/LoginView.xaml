@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="BloodPressure.Maui.Views.LoginView"
+             Title="LoginView">
+    <VerticalStackLayout>
+        <Label FontSize="Large">Iniciar sesion owo</Label>
+        <Label>Nombre Usuario</Label>
+        <Entry></Entry>
+        <Label>Contraseña</Label>
+        <Entry IsPassword="True"></Entry>
+        
+        <Label TextColor="Red" Text="Mensaje error"  FontSize="Small"></Label>
+        <Button Text="Entrar"></Button>
+
+        <Label TextDecorations="Underline" TextColor="LightBlue" HorizontalTextAlignment="Center" Text="Registrate">
+            <Label.GestureRecognizers>
+                <TapGestureRecognizer Command="{Binding GotoRegisterCommand}" />
+            </Label.GestureRecognizers>
+        </Label>
+
+    </VerticalStackLayout>
+</ContentPage>
